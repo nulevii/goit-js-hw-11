@@ -92,7 +92,7 @@ const updateImages = async link => {
   const lightbox = new SimpleLightbox('.gallery a', {
     captionDelay: 250,
   });
-  if (page <= pagesQTT) {
+  if (page < pagesQTT) {
     LOAD_MORE_BTN.classList.remove('hidden');
   }
 };
@@ -103,7 +103,6 @@ const initialLoad = event => {
     Notifix.Notify.warning('please fill in the text box.');
     return;
   }
-  LOAD_MORE_BTN.classList.add('hidden');
   page = 1;
   GALLERY.innerHTML = '';
   const link = `${url}?key=${key}&q=${searchParams}&image_type=${image_type}&orientation=${orientation}&safesearch=${safesearch}&page=${page}&per_page=${per_page}`;
