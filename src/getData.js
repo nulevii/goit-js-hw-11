@@ -7,7 +7,6 @@ const getData = async params => {
   const image_type = 'photo';
   const orientation = 'horizontal';
   const safesearch = true;
-  console.log(params);
   try {
     const data = await axios.get(url, {
       params: { key, image_type, orientation, safesearch, ...params },
