@@ -9,30 +9,18 @@ import getData from './getData';
 const FORM = document.querySelector('#search-form');
 const SEARCH_BAR = document.querySelector('#search-form input');
 const SEARCH_BUTTON = document.querySelector('#search-form button');
+SEARCH_BUTTON.textContent = '\u{1F50D}';
 const GALLERY = document.querySelector('.gallery');
 const LOAD_MORE_BTN = document.querySelector('.load-more');
 
-const url = 'https://pixabay.com/api/';
-const key = '27364037-494c2c1537a13aa746fb2bd48';
-const image_type = 'photo';
-const orientation = 'horizontal';
-const safesearch = true;
-const per_page = 40;
-let page = 1;
-let searchParams = '';
-
-FORM.style =
-  'display: flex; justify-content: center; background-color: #4056b4; padding: 10px';
-SEARCH_BAR.style =
-  'border: 1px solid white; border-radius: 4px 0 0 4px; border-right: none';
-SEARCH_BUTTON.style =
-  'border: 1px solid white; border-radius: 0 4px 4px 0; border-left: none';
-SEARCH_BUTTON.textContent = '\u{1F50D}';
-GALLERY.style =
-  'display: flex; justify-content: center; flex-wrap: wrap; padding: 20px 0; gap: 1vw';
+const params = {
+  per_page: 40,
+  page: 1,
+  q: '',
+};
 
 const updateSearchParams = event => {
-  searchParams = event.target.value.trim().replace(/\s+/g, '+');
+  params.q = event.target.value.trim().replace(/\s+/g, '+');
 };
 
 const convertImages = picturesArray => {
@@ -74,8 +62,8 @@ const convertImages = picturesArray => {
   );
 };
 
-const updateImages = async link => {
-  const data = await getData(link);
+const updateImages = async params => {
+  const data = await getData(params);
   const picturesArray = data.data.hits;
 
   if (picturesArray.length === 0) {
@@ -86,34 +74,42 @@ const updateImages = async link => {
   }
 
   const imagesQTT = data.data.totalHits;
-  const pagesQTT = Math.ceil(imagesQTT / per_page);
+  const pagesQTT = Math.ceil(imagesQTT / params.per_page);
   const images = convertImages(picturesArray).join('');
-  GALLERY.innerHTML = `${GALLERY.innerHTML} ${images}`;
+  GALLERY.innerHTML += images;
   const lightbox = new SimpleLightbox('.gallery a', {
     captionDelay: 250,
   });
-  if (page < pagesQTT) {
+  if (params.page < pagesQTT) {
     LOAD_MORE_BTN.classList.remove('hidden');
+  }
+
+  if (params.page === 1) {
+    Notifix.Notify.info(`Hooray! We found ${imagesQTT} images.`);
+  }
+
+  if (params.page !== 1 && params.page <= pagesQTT) {
+    Notifix.Notify.info(
+      "We're sorry, but you've reached the end of search results."
+    );
   }
 };
 
 const initialLoad = event => {
   event.preventDefault();
-  if (searchParams === '') {
+  if (params.q === '') {
     Notifix.Notify.warning('please fill in the text box.');
     return;
   }
-  page = 1;
+  params.page = 1;
   GALLERY.innerHTML = '';
-  const link = `${url}?key=${key}&q=${searchParams}&image_type=${image_type}&orientation=${orientation}&safesearch=${safesearch}&page=${page}&per_page=${per_page}`;
-  updateImages(link);
+  updateImages(params);
 };
 
 const loadMore = () => {
   LOAD_MORE_BTN.classList.add('hidden');
-  page += 1;
-  const link = `${url}?key=${key}&q=${searchParams}&image_type=${image_type}&orientation=${orientation}&safesearch=${safesearch}&page=${page}&per_page=${per_page}`;
-  updateImages(link);
+  params.page += 1;
+  updateImages(params);
 };
 
 SEARCH_BAR.addEventListener('input', updateSearchParams);
