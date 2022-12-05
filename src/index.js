@@ -12,7 +12,7 @@ const SEARCH_BUTTON = document.querySelector('#search-form button');
 SEARCH_BUTTON.textContent = '\u{1F50D}';
 const GALLERY = document.querySelector('.gallery');
 const LOAD_MORE_BTN = document.querySelector('.load-more');
-
+let lightbox;
 const params = {
   per_page: 40,
   page: 1,
@@ -70,6 +70,7 @@ const updateImages = async params => {
     Notifix.Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
+    LOAD_MORE_BTN.classList.add('hidden');
     return;
   }
 
@@ -77,7 +78,7 @@ const updateImages = async params => {
   const pagesQTT = Math.ceil(imagesQTT / params.per_page);
   const images = convertImages(picturesArray).join('');
   GALLERY.innerHTML += images;
-  const lightbox = new SimpleLightbox('.gallery a', {
+  lightbox = new SimpleLightbox('.gallery a', {
     captionDelay: 250,
   });
   if (params.page < pagesQTT) {
@@ -88,7 +89,7 @@ const updateImages = async params => {
     Notifix.Notify.info(`Hooray! We found ${imagesQTT} images.`);
   }
 
-  if (params.page !== 1 && params.page <= pagesQTT) {
+  if (params.page !== 1 && params.page >= pagesQTT) {
     Notifix.Notify.info(
       "We're sorry, but you've reached the end of search results."
     );
