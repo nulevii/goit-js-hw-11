@@ -12,7 +12,10 @@ const SEARCH_BUTTON = document.querySelector('#search-form button');
 SEARCH_BUTTON.textContent = '\u{1F50D}';
 const GALLERY = document.querySelector('.gallery');
 const LOAD_MORE_BTN = document.querySelector('.load-more');
-let lightbox;
+const   lightbox = new SimpleLightbox('.gallery a', {
+  captionDelay: 250,
+});
+
 const params = {
   per_page: 40,
   page: 1,
@@ -78,9 +81,7 @@ const updateImages = async params => {
   const pagesQTT = Math.ceil(imagesQTT / params.per_page);
   const images = convertImages(picturesArray).join('');
   GALLERY.innerHTML += images;
-  lightbox = new SimpleLightbox('.gallery a', {
-    captionDelay: 250,
-  });
+   lightbox.refresh();
   if (params.page < pagesQTT) {
     LOAD_MORE_BTN.classList.remove('hidden');
   }
